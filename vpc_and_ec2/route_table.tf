@@ -12,7 +12,7 @@ resource "aws_route_table" "public_secondary_rt" {
   ]
 
   tags = {
-    Name = "ans-01-public-econdary-rt"
+    Name = "public-econdary-rt"
   }
 }
 
@@ -41,7 +41,7 @@ resource "aws_route_table" "private_secondary_rt" {
   ]
 
   tags = {
-    Name = "ans-01-private-secondary-rt"
+    Name = "private-secondary-rt"
   }
 }
 

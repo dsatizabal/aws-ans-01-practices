@@ -7,6 +7,6 @@ resource "aws_internet_gateway" "igw" {
   ]
 
   tags = {
-    Name = "ans-01-internet-gateway"
+    Name = "internet-gateway"
   }
 }

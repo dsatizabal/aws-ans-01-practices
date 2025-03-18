@@ -3,7 +3,7 @@ resource "aws_nat_gateway" "ngwy" {
   subnet_id     = aws_subnet.public_subnets[0].id
 
   tags = {
-    Name = "ans-01-ngw-tf"
+    Name = "ngw-tf"
   }
 
   depends_on = [
