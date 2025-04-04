@@ -1,0 +1,31 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+Description:
+  Deploys subnets according to provided parameters
+
+Parameters:
+  SubnetCIDRs:
+    Type: CommaDelimitedList
+  SubnetAZs:
+    Type: CommaDelimitedList
+  VPCId:
+    Type: String
+  PublicSubnets:
+    Type: CommaDelimitedList
+
+Resources:
+  Subnets:
+    Fn::ForEach::Loop:
+      - CIDRIndex
+      - !Ref SubnetCIDRs
+      - "Subnet${CIDRIndex}":
+          Type: AWS::EC2::Subnet
+          Properties:
+            VpcId: !Ref VpcId
+            CidrBlock: !Select [ !Ref CIDRIndex, !Ref SubnetCIDRs ]
+            AvailabilityZone:  !Select [ !Ref CIDRIndex, !Ref SubnetAZs ]
+            MapPublicIpOnLaunch: !Select [ !Ref CIDRIndex, !Ref PublicSubnets ]
+            Tags:
+              - Key: Name
+                Value: "subnet-${CIDRIndex}"
