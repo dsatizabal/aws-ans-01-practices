@@ -13,9 +13,10 @@ resource "aws_subnet" "private_subnets" {
 resource "aws_subnet" "public_subnets" {
   count = length(var.public_subnets_cidrs)
 
-  vpc_id            = aws_vpc.vpc.id
-  cidr_block        = var.public_subnets_cidrs[count.index]
-  availability_zone = element(var.subnets_azs, count.index)
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = var.public_subnets_cidrs[count.index]
+  availability_zone       = element(var.subnets_azs, count.index)
+  map_public_ip_on_launch = true
 
   tags = {
     Name = "ans-01-public-subnet-${count.index}"

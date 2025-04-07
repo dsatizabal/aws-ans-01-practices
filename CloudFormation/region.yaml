@@ -1,0 +1,66 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+Description:
+  Deploys a region with all the necessary components, including VPC, subnets, and route tables.
+
+Parameters:
+  Region:
+    Description: Current region
+    Type: String
+    Default: east-us-2
+    ConstraintDescription: Must be a valid AWS region.
+
+Mappings:
+  RegionMap:
+    us-east-1:
+      InstanceType: t2.micro
+      VPCCIDR:  "10.0.0.0/16"
+      SubnetsCIDRs: "10.0.1.0/24,10.0.2.0/24"
+      publicAZs: "us-east-1a,us-east-1b"
+      publicSubnets: "true,false"
+    us-east-2:
+      InstanceType: t2.micro
+      VPCCIDR:  "10.1.0.0/16"
+      SubnetsCIDRs: "10.1.1.0/24,10.1.2.0/24"
+      publicAZs: "us-east-2a,us-east-2b"
+      publicSubnets: "true,false"
+    us-west-1:
+      InstanceType: t2.micro
+      VPCCIDR:  "10.2.0.0/16"
+      SubnetsCIDRs: "10.2.1.0/24,10.2.2.0/24,10.2.2.0/24"
+      publicAZs: "us-west-1a,us-west-1b,us-west-1c"
+      publicSubnets: "true,false,false"
+    us-west-2:
+      InstanceType: t2.micro
+      VPCCIDR:  "10.3.0.0/16"
+      SubnetsCIDRs: "10.3.1.0/24,10.3.2.0/24"
+      publicAZs: "us-west-2a,us-west-2b"
+      publicSubnets: "true,false"
+    eu-central-1:
+      InstanceType: t2.micro
+      VPCCIDR:  "10.4.0.0/16"
+      SubnetsCIDRs: "10.4.1.0/24"
+      publicSubnets: "false"
+      publicAZs: "eu-central-1a"
+
+Resources:
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://cloudformationdsp.s3.us-east-2.amazonaws.com/vpc.yaml
+      TimeoutInMinutes: 1
+      Parameters:
+        Region: !Ref Region
+        VPCCIDR: !FindInMap [RegionMap, !Ref Region, VPCCIDR]
+  Subnets:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://cloudformationdsp.s3.us-east-2.amazonaws.com/subnets.yaml
+      TimeoutInMinutes: 1
+      Parameters:
+        Region: !Ref Region
+        SubnetCIDRs: !FindInMap [RegionMap, !Ref Region, SubnetsCIDRs]
+        SubnetAZs: !FindInMap [RegionMap, !Ref Region, publicAZs]
+        PublicSubnets: !FindInMap [RegionMap, !Ref Region, publicSubnets]
+        VPCId: !GetAtt VPC.Outputs.VPCId
