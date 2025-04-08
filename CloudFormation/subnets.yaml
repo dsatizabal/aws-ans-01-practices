@@ -1,5 +1,6 @@
 ---
 AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::LanguageExtensions
 
 Description:
   Deploys subnets according to provided parameters
@@ -20,16 +21,23 @@ Parameters:
     ConstraintDescription: Must be a valid AWS region.
 
 Resources:
-  'Fn::ForEach::Subnets':
-    - CIDRIndex
-    - !Ref SubnetCIDRs
-    - 'Subnet${CIDRIndex}':
-        Type: AWS::EC2::Subnet
-        Properties:
-          VpcId: !Ref VPCId
-          CidrBlock: !Select [ !Ref CIDRIndex, !Ref SubnetCIDRs ]
-          AvailabilityZone:  !Select [ !Ref CIDRIndex, !Ref SubnetAZs ]
-          MapPublicIpOnLaunch: !Select [ !Ref CIDRIndex, !Ref PublicSubnets ]
-          Tags:
-            - Key: Name
-              Value: "subnet-${Region}-${CIDRIndex}"
+  Subnets:
+    Fn::ForEach::SubnetLoop:
+      - CIDRIndex
+      - !Ref SubnetCIDRs
+      - Subnet${CIDRIndex}:
+          Type: AWS::EC2::Subnet
+          Properties:
+            VpcId: !Ref VPCId
+            CidrBlock: !Select
+              - !Sub "${CIDRIndex}"
+              - !Ref SubnetCIDRs
+            AvailabilityZone: !Select
+              - !Sub "${CIDRIndex}"
+              - !Ref SubnetAZs
+            MapPublicIpOnLaunch: !Select
+              - !Sub "${CIDRIndex}"
+              - !Ref PublicSubnets
+            Tags:
+              - Key: Name
+                Value: !Sub "subnet-${Region}-${CIDRIndex}"
