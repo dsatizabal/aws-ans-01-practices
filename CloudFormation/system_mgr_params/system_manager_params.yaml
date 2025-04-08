@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description:
+  Use of System Manager parameters
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 192.168.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: '{{resolve:ssm:cloudformation-network-prefix:1}}'
+

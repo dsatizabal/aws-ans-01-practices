@@ -1,0 +1,54 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+Description:
+  First template for the VPC project (ANS-01)
+
+Parameters:
+  VPCCIDR:
+    Type: String
+    Description: CIDR block for the VPC
+    Default: 10.0.0.0/16
+    ConstraintDescription: Must be a valid RFC 1918 CIDR block.
+  Region:
+    Type: String
+    Description: Current deployment region
+    Default: us-east-2
+    ConstraintDescription: Must be a valid AWS region.
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VPCCIDR
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: !Sub "vpc-${Region}"
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "vpc-${Region}-igw"
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+Outputs:
+  VPCId:
+    Description: "VPC ID"
+    Value: !Ref VPC
+    Export:
+      Name: !Sub "${AWS::StackName}-VPCId"
+  InternetGatewayId:
+    Description: "Internet Gateway ID"
+    Value: !Ref InternetGateway
+    Export:
+      Name: !Sub "${AWS::StackName}-InternetGatewayId"
