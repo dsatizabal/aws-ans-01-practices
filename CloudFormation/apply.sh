@@ -1,17 +1,16 @@
 #!/bin/bash
-# Deploy to multiple regions with region-specific CIDRs
-# aws cloudformation describe-stack-events --stack-name MultiRegionVPC-us-east-1
-# REGIONS=("us-east-1" "us-west-2" "eu-central-1")
-REGIONS=("us-east-1")
 
-for i in "${!REGIONS[@]}"; do
-  region=${REGIONS[$i]}
+REGIONS=("us-east-1" "us-west-2" "eu-central-1")
+BUCKET_NAME="cloudformationdsp"
 
+for region in "${REGIONS[@]}"; do
+  echo "Deploying to $region"
   aws cloudformation deploy \
-    --region $region \
+    --region "$region" \
     --template-file region.yaml \
     --stack-name "MultiRegionVPC-$region" \
     --parameter-overrides \
-        Region=$region \
+        Region="$region" \
+        TemplateBucket="$BUCKET_NAME" \
     --capabilities CAPABILITY_AUTO_EXPAND
 done
